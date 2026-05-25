@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TinyPDF Studio - Image and PDF Tools</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="app-title">
+        <div class="intro">
+          <div>
+            <p class="eyebrow">TinyPDF Studio</p>
+            <h1 id="app-title">Create, edit, compress, and convert image-ready PDFs.</h1>
+          </div>
+          <div class="hero-side">
+            <div class="visitor-counter" aria-label="Visitor count">
+              <span class="counter-label">Visitors</span>
+              <strong id="visitor-count">0</strong>
+              <span class="counter-note">on this browser</span>
+            </div>
+            <div class="file-visual" aria-hidden="true">
+              <div class="sheet sheet-pdf">PDF</div>
+              <div class="sheet sheet-img">PNG</div>
+              <div class="sheet sheet-jpg">JPG</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-tabs" role="tablist" aria-label="Conversion tools">
+          <button class="tab-button active" type="button" data-panel="image-panel" role="tab" aria-selected="true">
+            Image Compressor
+          </button>
+          <button class="tab-button" type="button" data-panel="pdf-panel" role="tab" aria-selected="false">
+            PDF Compressor
+          </button>
+          <button class="tab-button" type="button" data-panel="image-pdf-panel" role="tab" aria-selected="false">
+            Image to PDF
+          </button>
+          <button class="tab-button" type="button" data-panel="convert-panel" role="tab" aria-selected="false">
+            PDF to Image
+          </button>
+        </div>
+
+        <section id="image-panel" class="tool-panel active" role="tabpanel">
+          <div class="tool-grid">
+            <label class="drop-zone" for="image-input">
+              <input id="image-input" type="file" accept="image/*">
+              <span class="drop-icon">+</span>
+              <span class="drop-title">Upload photo</span>
+              <span class="drop-note">JPG, PNG, or WEBP. Output is tuned below 100KB.</span>
+            </label>
+
+            <div class="settings">
+              <label>
+                Output format
+                <select id="image-format">
+                  <option value="image/jpeg">JPG</option>
+                  <option value="image/png">PNG</option>
+                  <option value="image/webp">WEBP</option>
+                  <option value="application/pdf">PDF</option>
+                </select>
+              </label>
+              <label>
+                Max size
+                <input id="image-target" type="number" min="10" max="500" value="100">
+                <span>KB</span>
+              </label>
+              <button id="compress-image" class="primary-action" type="button">Compress photo</button>
+            </div>
+          </div>
+          <div id="image-result" class="result-area" aria-live="polite"></div>
+        </section>
+
+        <section id="image-pdf-panel" class="tool-panel" role="tabpanel" hidden>
+          <div class="pdf-builder">
+            <div class="page-manager">
+              <label class="drop-zone compact-drop" for="image-pdf-input">
+                <input id="image-pdf-input" type="file" accept="image/*" multiple>
+                <span class="drop-icon">+</span>
+                <span class="drop-title">Add pages</span>
+                <span class="drop-note">Upload one or many photos.</span>
+              </label>
+              <div id="image-page-list" class="page-list" aria-label="PDF pages"></div>
+            </div>
+
+            <div class="editor-preview">
+              <canvas id="image-editor-canvas" width="800" height="1000"></canvas>
+              <p id="editor-empty" class="empty-preview">Upload images to start editing PDF pages.</p>
+            </div>
+
+            <div class="settings editor-settings">
+              <div class="control-row">
+                <button id="rotate-left" class="secondary-action" type="button">Rotate left</button>
+                <button id="rotate-right" class="secondary-action" type="button">Rotate right</button>
+              </div>
+              <label>
+                Brightness
+                <input id="image-brightness" type="range" min="50" max="150" value="100">
+                <span id="image-brightness-value">100%</span>
+              </label>
+              <label>
+                Crop
+                <select id="image-crop-mode">
+                  <option value="full">Full image</option>
+                  <option value="square">Square</option>
+                  <option value="portrait">Portrait 4:5</option>
+                  <option value="landscape">Landscape 16:9</option>
+                  <option value="inset">Custom inset</option>
+                </select>
+              </label>
+              <label>
+                Crop inset
+                <input id="image-crop-inset" type="range" min="0" max="40" value="0">
+                <span id="image-crop-inset-value">0%</span>
+              </label>
+              <label>
+                Save mode
+                <select id="image-pdf-mode">
+                  <option value="readable">Readable document</option>
+                  <option value="strict">Strict under target</option>
+                </select>
+              </label>
+              <label>
+                Final PDF size
+                <input id="image-pdf-target" type="number" min="20" max="500" value="100">
+                <span>KB</span>
+              </label>
+              <label>
+                PDF quality
+                <select id="image-pdf-quality">
+                  <option value="0.92">Best</option>
+                  <option value="0.82">Clear</option>
+                  <option value="0.62">Small</option>
+                  <option value="0.42">Very small</option>
+                </select>
+              </label>
+              <label>
+                Max page width
+                <input id="image-pdf-width" type="number" min="400" max="2400" value="1600">
+                <span>px</span>
+              </label>
+              <div class="control-row">
+                <button id="reset-page-edits" class="secondary-action" type="button">Reset page</button>
+                <button id="remove-page" class="secondary-action danger-action" type="button">Remove page</button>
+              </div>
+              <div class="control-row page-order-controls">
+                <button id="move-page-up" class="secondary-action" type="button">Move up</button>
+                <button id="move-page-down" class="secondary-action" type="button">Move down</button>
+                <button id="shuffle-pages" class="secondary-action wide-action" type="button">Shuffle pages</button>
+              </div>
+              <button id="create-image-pdf" class="primary-action" type="button">Create PDF</button>
+            </div>
+          </div>
+          <div id="image-pdf-result" class="result-area" aria-live="polite"></div>
+        </section>
+
+        <section id="pdf-panel" class="tool-panel" role="tabpanel" hidden>
+          <div class="tool-grid">
+            <label class="drop-zone" for="pdf-input">
+              <input id="pdf-input" type="file" accept="application/pdf">
+              <span class="drop-icon">+</span>
+              <span class="drop-title">Upload PDF</span>
+              <span class="drop-note">Pages are rebuilt as compressed images for a tiny file.</span>
+            </label>
+
+            <div class="settings">
+              <label>
+                Compression level
+                <select id="pdf-quality">
+                  <option value="0.35">Small</option>
+                  <option value="0.22">Very small</option>
+                  <option value="0.12">Extreme</option>
+                </select>
+              </label>
+              <label>
+                Page scale
+                <input id="pdf-scale" type="range" min="0.45" max="1.2" step="0.05" value="0.75">
+                <span id="pdf-scale-value">75%</span>
+              </label>
+              <button id="compress-pdf" class="primary-action" type="button">Compress PDF</button>
+            </div>
+          </div>
+          <div id="pdf-result" class="result-area" aria-live="polite"></div>
+        </section>
+
+        <section id="convert-panel" class="tool-panel" role="tabpanel" hidden>
+          <div class="tool-grid">
+            <label class="drop-zone" for="convert-input">
+              <input id="convert-input" type="file" accept="application/pdf">
+              <span class="drop-icon">+</span>
+              <span class="drop-title">Upload PDF</span>
+              <span class="drop-note">Convert each page to JPG or PNG images.</span>
+            </label>
+
+            <div class="settings">
+              <label>
+                Image format
+                <select id="convert-format">
+                  <option value="image/jpeg">JPG</option>
+                  <option value="image/png">PNG</option>
+                </select>
+              </label>
+              <label>
+                Render scale
+                <input id="convert-scale" type="range" min="0.75" max="2" step="0.05" value="1.25">
+                <span id="convert-scale-value">125%</span>
+              </label>
+              <button id="convert-pdf" class="primary-action" type="button">Convert PDF</button>
+            </div>
+          </div>
+          <div id="convert-result" class="result-area" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
